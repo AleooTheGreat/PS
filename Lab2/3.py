@@ -11,7 +11,7 @@ def semnal_sawtooth(t,f):
 def semnal_square(t,f):
     return np.sign(np.sin(2 * np.pi * f * t))
 
-t = np.linspace(100,300,1600 * 5) # 5 sec
+t = np.linspace(100,300,1600 * 15) # 15 sec
 sd.default.samplerate = 44100
 #a
 sin = semnal_sinusoidal(t,400)
@@ -41,3 +41,6 @@ print('Done square')
 # Save + listen
 wv.write('sawtooth_5_sec.wav', 44100, saw)
 loaded_rate, loaded_data = wv.read('sawtooth_5_sec.wav')
+sd.play(loaded_data, loaded_rate)
+sd.wait()
+print('Done sawtooth')
