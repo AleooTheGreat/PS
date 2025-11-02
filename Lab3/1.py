@@ -21,14 +21,19 @@ prod = m @ trans
 print(np.allclose(prod, prod[0][0] * np.eye(n)))
 
 
-fig, axs = plt.subplots(8,2)
-fig.suptitle("Matricea Fourier")
+fig, axs = plt.subplots(n,figsize = (10,14))
+fig.suptitle("Matricea Fourier - Componente Reale si Imaginare")
 
 for i in range(n):
-    axs[i, 0].plot(m[i, :].real)
-    axs[i, 0].grid(True)
+    axs[i].set(ylim = (-1.1,1.1), title = f'Randul {i}')
 
-    axs[i, 1].plot(m[i, :].imag)
-    axs[i, 1].grid(True)
+    axs[i].plot(m[i, :].real, color = 'red', label = 'Partea Reala')
+    axs[i].grid(True)
 
+    axs[i].plot(m[i, :].imag,'--', color = 'green', label = 'Partea Imaginara')
+    axs[i].grid(True)
+
+plt.legend()
+plt.savefig("1.pdf")
+plt.tight_layout()
 plt.show()
