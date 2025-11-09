@@ -1,0 +1,2 @@
+# In fisierul vocale.wav se afla vocalele salvate cu ajutorul lui Audacity. Se poate obeserva o diferenta intre vocale pe baza sepectogramei,
+# dar nu cred ca as putea sa disting perfect diferentele dintre ele.
