@@ -12,6 +12,7 @@ train_file = train_file[1:, 2]
 # a
 # Din moment ce sistemul inregistreaza odata pe ora, frecventa de esantionare este 1/1h = 1/3600s
 fs = 1/3600
+
 # b
 # Avem 18288 de ore, deci 18288/24 = 762 de zile perioada de timp
 print(f'Perioada de timp esantionata este {len(train_file)} ore = {len(train_file)/24} zile')
