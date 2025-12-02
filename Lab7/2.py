@@ -1,4 +1,4 @@
-from scipy import datasets, ndimage
+from scipy import datasets
 import numpy as np
 import matplotlib.pyplot as plt
 

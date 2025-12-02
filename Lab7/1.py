@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from IPython.core.pylabtools import figsize
 
 pi = np.pi
 

@@ -1,7 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.pyplot import xlabel, ylabel
-from sympy.printing.pretty.pretty_symbology import line_width
 
 n = 1000
 pi = np.pi
