@@ -67,10 +67,13 @@ def b(s,t):
 def c(s, t, plot, vec = ([5,10], [50,100], [100, 225], [200,600])):
     p_m = vec
     final_pred = []
+    final_pred_c = []
 
     for k in range(len(p_m)):
         p,m = p_m[k]
         predictions = []
+        predictions_ones = []
+
 
         for i in range(900,1000):
             y = s[i-m+1 : i+1]
@@ -79,13 +82,25 @@ def c(s, t, plot, vec = ([5,10], [50,100], [100, 225], [200,600])):
                 col.append(s[i-m-j+1 : i-j+1])
 
             Y = np.column_stack(col)
-            x = np.linalg.inv(Y.T @ Y) @ (Y.T @ y)
 
-            y2 = s[i : i-p : -1]
+            col.append(np.ones(m))
+            Y_ones = np.column_stack(col)
+
+            x = np.linalg.lstsq(Y, y)[0]
+            x_ones = np.linalg.lstsq(Y_ones, y, rcond=None)[0]
+
+
+            y2 = s[i-p : i]
             y2 = y2[::-1]
+
+            y3 = y2.copy()
+            y3 = np.append(y3, 1)
+
             predictions.append(x.T @ y2)
+            predictions_ones.append(x_ones.T @ y3)
 
         final_pred.append(predictions)
+        final_pred_c.append(predictions_ones)
 
     l = len(p_m)
     fig, axs = plt.subplots(l,figsize = (24,5 * l),gridspec_kw={'hspace': 0.1 * l})
@@ -94,12 +109,32 @@ def c(s, t, plot, vec = ([5,10], [50,100], [100, 225], [200,600])):
     for i in range(len(final_pred)):
         p,m = p_m[i]
         axs[i].plot(t,s, linewidth = 2, label = 'Semnal Original')
-        axs[i].plot(t[900:],final_pred[i],color = 'red', linewidth = 1, label = 'Predictie')
+        axs[i].plot(t[900:],final_pred[i],color = 'red', linewidth = 0.5, label = 'Predictie')
+        axs[i].plot(t[900:],final_pred_c[i],color = 'black', linewidth = 0.5, label = 'Predictie cu cloana de 1')
         axs[i].grid(True)
         axs[i].set(title = f'p = {p}, m = {m}', xlabel = 'Time', ylabel = 'Signal')
 
     plt.legend()
     plt.savefig('c.pdf')
+    plt.show()
+
+    fig, axs = plt.subplots(4, figsize = (20, 10))
+    fig.suptitle('Corelatie')
+
+    for k in range(len(final_pred)):
+        p = final_pred[k]
+        p = p - np.mean(p)
+        x = np.correlate(p, p, 'full')
+        pred_len = len(p)
+        x = x[pred_len - 1:]
+        x = x / x[0]
+
+        axs[k].plot(t[900:], x, label = 'corelatie')
+        axs[k].set(title='np.correlate', xlabel='Lag', ylabel='Autocorelatie')
+        axs[k].grid(True)
+
+    plt.legend()
+    plt.savefig('c_corelatie.pdf')
     plt.show()
 
     return final_pred
@@ -128,9 +163,10 @@ def d(s,t):
                     col.append(s[i - m - j + 1: i - j + 1])
 
                 Y = np.column_stack(col)
-                x = np.linalg.inv(Y.T @ Y) @ (Y.T @ y)
 
-                y2 = s[i: i - p: -1]
+                x = np.linalg.lstsq(Y, y)[0]
+
+                y2 = s[i - p: i]
                 y2 = y2[::-1]
 
                 pred.append(x.T @ y2)
@@ -149,7 +185,6 @@ def d(s,t):
 
     plt.plot(t, s, linewidth=2, label = 'Semnal Original')
     plt.plot(t[900:], best_pred, color='red', linewidth=1, label = 'Predictie')
-
     plt.title(f'Best parameters: p = {best_p}, m = {best_m}, MAE = {round(best_mae,6)}')
     plt.xlabel('Time')
     plt.ylabel('Signal')
@@ -170,5 +205,5 @@ serie = trend + sezon + variatii_mici
 
 # a(t, serie, trend, sezon, variatii_mici)
 # b(serie,t)
-# c(serie,t, True)
-d(serie,t)
+c(serie,t, True)
+# d(serie,t)
