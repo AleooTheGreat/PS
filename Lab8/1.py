@@ -77,25 +77,24 @@ def c(s, t, plot, vec = ([5,10], [50,100], [100, 225], [200,600])):
 
         for i in range(900,1000):
             y = s[i-m+1 : i+1]
-            col = []
-            for j in range(1,p+1):
-                col.append(s[i-m-j+1 : i-j+1])
+                        
+            Y = []
+            for j in range(i-m+1, i+1):
+                row = s[j - p : j]
+                row = row[::-1]
+                Y.append(row)
+            
+            Y = np.array(Y)
+            
+            Y_ones = np.column_stack([np.ones(m), Y])
 
-            Y = np.column_stack(col)
-
-            col.append(np.ones(m))
-            Y_ones = np.column_stack(col)
-
-            x = np.linalg.lstsq(Y, y)[0]
-            x_ones = np.linalg.lstsq(Y_ones, y, rcond=None)[0]
+            x = np.linalg.lstsq(Y, y, rcond = None)[0]
+            x_ones = np.linalg.lstsq(Y_ones, y, rcond = None)[0]
 
 
-            y2 = s[i-p : i]
-            y2 = y2[::-1]
-
-            y3 = y2.copy()
-            y3 = np.append(y3, 1)
-
+            y2 = np.array([s[i-j] for j in range(1, p+1)])
+            y3 = np.concatenate(([1], y2))
+            
             predictions.append(x.T @ y2)
             predictions_ones.append(x_ones.T @ y3)
 
@@ -113,8 +112,8 @@ def c(s, t, plot, vec = ([5,10], [50,100], [100, 225], [200,600])):
         axs[i].plot(t[900:],final_pred_c[i],color = 'black', linewidth = 0.5, label = 'Predictie cu cloana de 1')
         axs[i].grid(True)
         axs[i].set(title = f'p = {p}, m = {m}', xlabel = 'Time', ylabel = 'Signal')
+        axs[i].legend()
 
-    plt.legend()
     plt.savefig('c.pdf')
     plt.show()
 
@@ -132,8 +131,8 @@ def c(s, t, plot, vec = ([5,10], [50,100], [100, 225], [200,600])):
         axs[k].plot(t[900:], x, label = 'corelatie')
         axs[k].set(title='np.correlate', xlabel='Lag', ylabel='Autocorelatie')
         axs[k].grid(True)
+        axs[k].legend()
 
-    plt.legend()
     plt.savefig('c_corelatie.pdf')
     plt.show()
 
@@ -156,15 +155,19 @@ def d(s,t):
                 continue
             pred = []
 
+            print(f'{p}, {m}')
             for i in range(900, 1000):
                 y = s[i - m + 1: i + 1]
-                col = []
-                for j in range(1, p + 1):
-                    col.append(s[i - m - j + 1: i - j + 1])
 
-                Y = np.column_stack(col)
+                Y = []
+                for j in range(i-m+1, i+1):
+                    row = s[j - p : j]
+                    row = row[::-1]
+                    Y.append(row)
+                
+                Y = np.array(Y)
 
-                x = np.linalg.lstsq(Y, y)[0]
+                x = np.linalg.lstsq(Y, y, rcond = None)[0]
 
                 y2 = s[i - p: i]
                 y2 = y2[::-1]
@@ -205,5 +208,5 @@ serie = trend + sezon + variatii_mici
 
 # a(t, serie, trend, sezon, variatii_mici)
 # b(serie,t)
-c(serie,t, True)
+# c(serie,t, True)
 # d(serie,t)
