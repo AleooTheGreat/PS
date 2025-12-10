@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import statsmodels.api as sm
 
 n = 1000
 pi = np.pi
@@ -230,6 +231,43 @@ def b(x, t):
     plt.savefig('b.pdf')
     plt.show()
 
+def c(x,t):
+    pairs = [[p,q] for p in range(1,21,2) for q in range(1,21,2)]
+    
+    best_aic = np.inf
+    best_p = 0
+    best_q = 0
+    best_model = None
+    
+    for p,q in pairs:
+        try:
+            print(p,q)
+            mod = sm.tsa.arima.ARIMA(x[:900], order = (p,0,q))
+            ans = mod.fit()
+            if ans.aic < best_aic:
+                best_aic = ans.aic
+                best_p = p
+                best_q = q
+                best_model = ans
+        except:
+            continue
+        
+    Y = best_model.predict()
+    pred = best_model.forecast(steps = 1)
+    
+    plt.figure(figsize=(16, 10))
+    plt.plot(t[:900],x[:900], color = 'black', linewidth = 2, label = 'Original signal')
+    plt.scatter(t[900], x[900], color='blue', s=20, label='Real future values')
+    plt.scatter(t[900], pred, color='red', s=25, label='Predicted values')
+    plt.title(f'Predictie ARMA cu p = {best_p} si q = {best_q}')
+    plt.xlabel('Time')
+    plt.ylabel('Value')    
+    plt.legend()
+    plt.grid(True)
+    plt.savefig('c.pdf')
+    plt.show()
+                
+
 t = np.linspace(0,1,n)
 trend = get_trend(t)
 sezon = get_sezon(t)
@@ -238,4 +276,5 @@ variatii_mici = get_zgomot(n)
 serie = trend + sezon + variatii_mici
 
 # a(serie, t)
-b(serie, t)
+# b(serie, t)
+c(serie, t)
