@@ -98,7 +98,7 @@ def a(x, t):
     axs[1].legend()
     axs[1].grid(True)
     
-    plt.savefig('2_me.pdf')
+    plt.savefig('a.pdf')
     
     fig, axs = plt.subplots(3, figsize = (25, 16), gridspec_kw={'hspace': 0.3})
     fig.suptitle('Mediere simple, dubla si tripla')
@@ -188,10 +188,47 @@ def a(x, t):
     axs[2].legend()
     axs[2].grid(True)
     
-    plt.savefig('2_me_sdt.pdf')
+    plt.savefig('a_2.pdf')
     plt.show()
 
 
+def b(x, t):
+
+    n = len(x)
+    
+    p_values = [50,100,200,300]
+    
+    fig, axs = plt.subplots(len(p_values), figsize=(25, 5*len(p_values)), gridspec_kw={'hspace': 0.1 * len(p_values)})
+    fig.suptitle('Model MA')
+    
+    for i in range(len(p_values)):
+        p = p_values[i]        
+        
+        ma = np.convolve(x, np.ones(p)/p, mode='valid')
+        eps = x[p-1:] - ma
+        
+        Y = []
+        for k in range(p, len(eps)):
+            row = [eps[k-1-j] for j in range(p)] + [1]
+            Y.append(row)
+        
+        Y = np.array(Y)
+        y = ma[p:]
+        
+        theta = np.linalg.lstsq(Y, y, rcond=None)[0]
+        
+        Y_pred = eps[p:] + Y @ theta
+        
+        mae = np.mean(np.abs(x[p+p-1:] - Y_pred))
+
+        axs[i].plot(t, x, label='Valori reale', color='lightblue', linewidth=2)
+        axs[i].plot(t[p+p-1:], Y_pred, label=f'Predicți MA(p={p})', color='black', linewidth=1)
+        axs[i].set(title=(f'Model MA cu p={p}, MAE={mae:.4f}'), xlabel=('Time'), ylabel=('Value'))
+        axs[i].legend()
+        axs[i].grid(True)
+            
+    plt.savefig('b.pdf')
+    plt.show()
 
 t = np.linspace(0,1,n)
 trend = get_trend(t)
@@ -200,4 +237,5 @@ variatii_mici = get_zgomot(n)
 
 serie = trend + sezon + variatii_mici
 
-a(serie, t)
+# a(serie, t)
+b(serie, t)
